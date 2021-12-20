@@ -1,6 +1,6 @@
 
 // Сохранение прогресса в процессе прохождения, для возможности возобновления игры
-export function epAutosave(id, logic) {
+export function autosave(id, logic) {
 
     var newSave = {
         saved: true,
@@ -33,7 +33,7 @@ export function epAutosave(id, logic) {
 }
 
 // Сохранение по факту прохождения для отметки 'пройдено' в списке материалов
-export function epSaveCompletion(id, logic) {
+export function saveCompletion(id, logic) {
 
     // Ищем в истории и сохраняем
     if (localStorage.getItem('ep_history')) {

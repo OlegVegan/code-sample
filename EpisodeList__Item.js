@@ -1,6 +1,6 @@
 // React
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
 // Firebase
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
@@ -8,10 +8,14 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 // Helpers
 import { human_date, linesDeclension } from "../../common/Helpers"
 
+// Context
+import { GlobalContext } from "../../../GlobalContext";
+
 // Style
 import "./EpisodeList__Item.scss";
 
-export function EpisodesListItem({ id, epData, filter, userType, sub }) {
+export function EpisodesListItem({ id, data, filter }) {
+    const user = useContext(GlobalContext).userData
 
     // Обложка
     const [picStyle, setPicStyle] = useState({})
@@ -31,9 +35,15 @@ export function EpisodesListItem({ id, epData, filter, userType, sub }) {
     const [saved, setSaved] = useState(false)
     const [completed, setCompleted] = useState(false)
     const [completedPerfectly, setCompletedPerfectly] = useState(false)
+    const [savedProgress, setSavedProgress] = useState(null) // todo: пока нигде не используется
     useEffect(() => {
         if (localStorage.getItem('ep_history')) {
-            var ep_history = JSON.parse(localStorage.getItem('ep_history'));
+            var ep_history = JSON.parse(localStorage.getItem('ep_history'))
+
+            // Процент прогресса сохранения
+            function getPercent() {
+                return Math.round(((data.lines_left + data.lines_right + data.lines_center) / ep_history[id].currentLine) * 10) / 10
+            }
 
             if (!ep_history[id]) {
                 setSaved(false)
@@ -42,6 +52,7 @@ export function EpisodesListItem({ id, epData, filter, userType, sub }) {
             } else {
                 if (ep_history[id].saved) {
                     setSaved(true)
+                    setSavedProgress(getPercent() + "%")
                 }
                 if ((ep_history[id].timesPassed > 0) && (ep_history[id].failsRecord > 0)) {
                     setCompleted(true)
@@ -54,21 +65,21 @@ export function EpisodesListItem({ id, epData, filter, userType, sub }) {
     }, [])
 
     // Фильтр
-    if (epData.lines > filter.max || epData.lines < filter.min) return ""
+    if (data.lines > filter.max || data.lines < filter.min) return ""
 
     // Имена участников в зависимости от типа
     function epListNames(type) {
-        if (Number(type) === 2) return epData.left + ", " + epData.right
-        return epData.left
+        if (Number(type) === 2) return data.left + ", " + data.right
+        return data.left
     }
 
     return (
         <>
-            <Link to={`/episode/${epData.slug}`} style={{ color: 'inherit', textDecoration: 'inherit' }}>
-                <div className="episodes-item ctt" data-date={epData.timePublished} >
+            <Link to={`/episode/${data.slug}`} style={{ color: 'inherit', textDecoration: 'inherit' }}>
+                <div className="episodes-item ctt" data-date={data.timePublished} >
 
                     {/* Название */}
-                    <div className="episodes-item__name">{epData.name}</div>
+                    <div className="episodes-item__name">{data.name}</div>
 
                     {/* Персонажи и иконки сохранения и прохождения */}
                     <div className="episodes-item__container2">
@@ -76,20 +87,23 @@ export function EpisodesListItem({ id, epData, filter, userType, sub }) {
                             {saved ? <SavedTag /> : ""}
                             {completed ? <CompletedTag /> : ""}
                             {completedPerfectly ? <CompletedPerfectlyTag /> : ""}
-                            {(sub || epData.free) ? "" : <SubsOnlyTag />}
+                            {(user.sub || data.free) ? "" : <SubsOnlyTag />}
                         </div>
                         <div className="episodes-item__people">
                             <span className="material-icons tag-icon ep-people-tag" >people</span>
-                            {epListNames(epData.type)}
+                            {epListNames(data.type)}
                         </div>
                     </div>
 
                     {/* Картинка и продолжительность */}
                     <div className="episodes-item__container" style={picStyle}>
-                        <div className="episodes-item__duration">{linesDeclension(epData.lines)}, {epData.duration} мин.</div>
+                        <div className="episodes-item__duration">{linesDeclension(data.lines)}, {data.duration} мин.</div>
 
                         {/* Дата публикации для админа */}
-                        {userType === 'admin' ? <div style={{ padding: "10px", color: "white", fontSize: "30px" }}>{human_date(epData.timePublished.toDate(), false, true)}</div> : ""}
+                        {user.role === 'admin' ? <div style={{ padding: "10px", color: "white", fontSize: "30px", float: "right", textShadow: "#000 2px 2px 2px" }}>{human_date(data.timePublished.toDate(), false, true)}</div> : ""}
+
+                        {/* Прогресс бар прохождения todo: */}
+                        {/* <div style={{ height: "10px", backgroundColor: "yellow", float: "left", width: savedProgress }}></div> */}
                     </div>
                 </div>
             </Link>
@@ -98,7 +112,7 @@ export function EpisodesListItem({ id, epData, filter, userType, sub }) {
 }
 
 function SavedTag() {
-    return <span className="episodes-item__icons__tag material-icons" >save</span>
+    return <span className="episodes-item__icons__tag material-icons">save</span>
 }
 
 function CompletedTag() {

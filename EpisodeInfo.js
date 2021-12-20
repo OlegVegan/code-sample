@@ -6,7 +6,7 @@ import Select from "react-select"
 // Firebase
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
-// Contexts
+// Context
 import { GlobalContext } from "../../../../GlobalContext";
 
 // Style
@@ -15,7 +15,7 @@ import "./EpisodeInfo.scss";
 // Helpers
 import { human_date } from "../../../common/Helpers";
 import { LoadingTag } from "../../../common/Icons";
-import { linesDeclension } from "../../../common/Helpers";
+import { linesDeclension, minutesDeclension } from "../../../common/Helpers";
 
 // Components
 import { PicBlock } from "./EpisodeInfo__Pics"
@@ -34,7 +34,7 @@ export function EpisodeInfo({ id, data, logic, setLogic }) {
     // Звуки для картинок эпизода
     const [infoAudios, setInfoAudios] = useState()
     useEffect(() => {
-        setSiteData(p => ({ ...p, topBlock: null, crumbs: 'edisode_info' }))
+        setSiteData(p => ({ ...p, topBlock: null, crumbs: 'episode_info' }))
 
         // Звуки для картинок
         var dummy = {};
@@ -66,7 +66,8 @@ export function EpisodeInfo({ id, data, logic, setLogic }) {
         <>
             <div id="episode-info">
                 {/* Кнопка редактирования для админа*/}
-                {user.role === 'admin' ? <input value="Редактировать" type="button" onClick={() => navigate(`/episode_editor/${id}`)} /> : ""} <br />
+                {user.role === 'admin' ? <><br /><input value="🖊️ Редактировать" type="button" onClick={() => navigate(`/episode_editor/${id}`)} /><br /><br /></> : ""}
+                <br />
 
                 {/* Инфа о прохождении */}
                 <Extra id={id} />
@@ -75,7 +76,7 @@ export function EpisodeInfo({ id, data, logic, setLogic }) {
                 <div id="episode-start-text-top">
                     <div id="episode-start-date" className="ctt">Опубликовано {human_date(data.timePublished.toDate(), true, true)}</div>
                     <div id="episode-start-name">{data.name}</div>
-                    <div id="episode-start-duration" className="ctt">{"~" + data.duration + " минут"}</div>
+                    <div id="episode-start-duration" className="ctt">{"~ " + minutesDeclension(data.duration)}</div>
                     <div id="episode-start-desc">{data.desc}</div>
                 </div>
 
@@ -83,11 +84,13 @@ export function EpisodeInfo({ id, data, logic, setLogic }) {
                 <PicBlock id={id} type={data.type} infoAudios={infoAudios} logic={logic} setLogic={setLogic} />
 
                 {/* Количество строк */}
-                <div id="episode-start-line-counter" className="ctt">
-                    <div id="line-counter-left" className={(logic.mode === 1 || logic.mode === 3) ? "line-counter-div" : "line-counter-div pointy"} onClick={() => setLogic(p => ({ ...p, mode: 1 }))}>
-                        <div id="line-counter-left-info">{linesDeclension(data.lines_left)}</div>
+                <div id="episode-line-counter" className="ctt">
+                    <div className={(logic.mode === 1 || logic.mode === 3) ? "line-counter-div" : "line-counter-div pointy"} onClick={() => setLogic(p => ({ ...p, mode: 1 }))}>
+                        <div>{linesDeclension(data.lines_left)}</div>
                     </div>
-                    {Number(data.type) === 2 ? <div id="line-counter-right" className={(logic.mode === 2 || logic.mode === 3) ? "line-counter-div" : "line-counter-div pointy"} onClick={() => setLogic(p => ({ ...p, mode: 2 }))}><div id="line-counter-right-info">{linesDeclension(data.lines_right)}</div></div> : ""}
+                    {Number(data.type) === 2 ? <div className={(logic.mode === 2 || logic.mode === 3) ? "line-counter-div" : "line-counter-div pointy"} onClick={() => setLogic(p => ({ ...p, mode: 2 }))}>
+                        <div id="line-counter-right-info">{linesDeclension(data.lines_right)}</div>
+                    </div> : ""}
                 </div> <br />
 
                 {/* Выбор персонажа, если монолог, то нет выбора */}
@@ -107,11 +110,11 @@ export function EpisodeInfo({ id, data, logic, setLogic }) {
                     isSearchable={false} />
 
                 {/* Сообщение про монолог */}
-                {data.type === 1 ? <span style={{ color: "var(--text3)", margin: "20px", display: "block" }} className="ctt">Это монолог, тут только одна роль</span> : ""}
+                {data.type === 1 ? <span style={{ color: "var(--text3)", marginTop: "20px", display: "block" }} className="ctt">Это монолог, тут только одна роль</span> : ""}
 
-                {/* Запуск эпизода в зависимости от наличия саба и сейва */}
+                {/* Запуск эпизода в зависимости от наличия саба */}
                 {(data.free || (!data.free && user.sub)) ? <LaunchBlock id={id} name={data.name} infoAudios={infoAudios} logic={logic} setLogic={setLogic} /> : <NoSub />}
             </div>
         </>
-    );
+    )
 }
