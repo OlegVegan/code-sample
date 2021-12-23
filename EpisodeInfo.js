@@ -1,34 +1,32 @@
 // React
-import { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useContext } from "react"
 import Select from "react-select"
 
 // Firebase
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, getDownloadURL } from "firebase/storage"
 
 // Context
-import { GlobalContext } from "../../../../GlobalContext";
+import { GlobalContext } from "../../../../GlobalContext"
 
 // Style
 import "./EpisodeInfo.scss";
 
 // Helpers
-import { human_date } from "../../../common/Helpers";
-import { LoadingTag } from "../../../common/Icons";
-import { linesDeclension, minutesDeclension } from "../../../common/Helpers";
+import { LoadingTag } from "../../../common/Icons"
+import { linesDeclension, minutesDeclension, humanDate } from "../../../common/Helpers"
 
 // Components
-import { PicBlock } from "./EpisodeInfo__Pics"
-import { LaunchBlock } from "./EpisodeInfo__LaunchBlock"
-import NoSub from "./EpisodeInfo__LaunchBlock__NoSub"
-import Extra from "./EpisodeInfo__Extra"
+import EditBtn from "../../../common/material-info/EditBtn"
+import Extra from "../../../common/material-info/Extra"
+import PicBlock from "./EpisodeInfo__Pics"
+import LaunchBlock from "../../../common/material-info/LaunchBlock"
+import NoSub from "../../../common/material-info/NoSub"
 
 export function EpisodeInfo({ id, data, logic, setLogic }) {
     const user = useContext(GlobalContext).userData
     const setSiteData = useContext(GlobalContext).setSiteData
     const selectTheme = useContext(GlobalContext).selectTheme
 
-    const navigate = useNavigate()
     const storage = getStorage();
 
     // Звуки для картинок эпизода
@@ -66,18 +64,17 @@ export function EpisodeInfo({ id, data, logic, setLogic }) {
         <>
             <div id="episode-info">
                 {/* Кнопка редактирования для админа*/}
-                {user.role === 'admin' ? <><br /><input value="🖊️ Редактировать" type="button" onClick={() => navigate(`/episode_editor/${id}`)} /><br /><br /></> : ""}
-                <br />
+                <EditBtn id={id} page={'episode'} userRole={user.role} />
 
                 {/* Инфа о прохождении */}
-                <Extra id={id} />
+                {/* <Extra id={id} storageItem={'ep_history'} /> */}
 
                 {/* Текстовая информация */}
-                <div id="episode-start-text-top">
-                    <div id="episode-start-date" className="ctt">Опубликовано {human_date(data.timePublished.toDate(), true, true)}</div>
-                    <div id="episode-start-name">{data.name}</div>
-                    <div id="episode-start-duration" className="ctt">{"~ " + minutesDeclension(data.duration)}</div>
-                    <div id="episode-start-desc">{data.desc}</div>
+                <div id="episode-info-top-text">
+                    <div id="episode-info-date" className="ctt">Опубликовано {humanDate(data.timePublished.toDate(), true, true)}</div>
+                    <div id="episode-info-name">{data.name}</div>
+                    <div id="episode-info-duration" className="ctt">{"~ " + minutesDeclension(data.duration)}</div>
+                    <div id="episode-info-desc">{data.desc}</div>
                 </div>
 
                 {/* Картинки */}
@@ -94,7 +91,7 @@ export function EpisodeInfo({ id, data, logic, setLogic }) {
                 </div> <br />
 
                 {/* Выбор персонажа, если монолог, то нет выбора */}
-                <Select id={"episode-start-mode-select"}
+                <Select id={"episode-info-mode-select"}
                     theme={theme => ({
                         ...theme,
                         borderRadius: 0,

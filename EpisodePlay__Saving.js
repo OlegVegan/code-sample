@@ -9,7 +9,7 @@ export function autosave(id, logic) {
         myLinesPassed: logic.myLinesPassed,
         fails: logic.failsOverall,
         failsRecord: logic.failsRecord,
-        userWordsMatched: logic.userWordsMatched,
+        matchesInARow: logic.matchesInARow,
         timesPassed: logic.timesPassed
     }
 
