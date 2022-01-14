@@ -1,12 +1,10 @@
 // React
-import { useNavigate } from "react-router-dom"
 import { useState, useEffect, useContext } from "react"
-
-// Firebase
-import { getStorage, ref, getDownloadURL } from "firebase/storage"
+import { useNavigate } from "react-router-dom"
 
 // Helpers
 import { humanDate, linesDeclension } from "../../common/Helpers"
+import { SavedTag, CompletedTag, CompletedPerfectlyTag, SubsOnlyTag } from "../../common/Icons"
 
 // Context
 import { GlobalContext } from "../../../GlobalContext"
@@ -17,30 +15,35 @@ import ProgressBar from "../../common/ProgressBar"
 // Style
 import "./EpisodeList__Item.scss"
 
-export default function EpisodesListItem({ id, data, filter }) {
+export default function EpisodesListItem({ epData, epIndex, filter }) {
     const user = useContext(GlobalContext).userData
+    const epCovers = useContext(GlobalContext).epCovers
     const navigate = useNavigate()
+    const id = epData.id
 
     // Обложка
-    const [picStyle, setPicStyle] = useState({})
-    const storage = getStorage();
-    useEffect(() => {
-        getDownloadURL(ref(storage, 'episodes/' + id + '/' + id + '_cover.jpg')).then((url) => {
-            if (url) {
-                setPicStyle({
+    const [picStyle] = useState(() => {
+        for (let i = 0; i < epCovers.length; i++) {
+            if (epCovers[i].id === id) {
+                return {
                     backgroundSize: 'cover',
-                    backgroundImage: 'url(' + url + ')',
-                })
+                    backgroundImage: 'url(' + epCovers[i].cover + ')',
+                }
             }
-        })
-    }, [])
+        }
+    })
 
     // История прохождения
     const [saved, setSaved] = useState(false)
     const [completed, setCompleted] = useState(false)
     const [completedPerfectly, setCompletedPerfectly] = useState(false)
     const [currentLine, setCurrentLine] = useState(null)
-    const [overallLines, setOverallLines] = useState(null)
+    const [overallLines] = useState(() => {
+        return epData.lines_left + epData.lines_right + epData.lines_center - 1
+    })
+    const [lines] = useState(() => {
+        return epData.lines_left + epData.lines_right
+    })
 
     useEffect(() => {
         if (localStorage.getItem('ep_history')) {
@@ -57,11 +60,12 @@ export default function EpisodesListItem({ id, data, filter }) {
                 if (ep_history[id].saved) {
                     setSaved(true)
                     setCurrentLine(ep_history[id].currentLine)
-                    setOverallLines(data.lines_left + data.lines_right + data.lines_center)
                 }
+
                 if ((ep_history[id].timesPassed > 0) && (ep_history[id].failsRecord > 0)) {
                     setCompleted(true)
                 }
+
                 if ((ep_history[id].timesPassed > 0) && (ep_history[id].failsRecord === 0)) {
                     setCompletedPerfectly(true)
                 }
@@ -70,60 +74,51 @@ export default function EpisodesListItem({ id, data, filter }) {
     }, [])
 
     // Фильтр
-    if (data.lines > filter.max || data.lines < filter.min) return ""
+    if (lines > filter.max || lines < filter.min) return ""
 
     // Имена участников в зависимости от типа
     function epListNames(type) {
-        if (Number(type) === 2) return data.left + ", " + data.right
-        return data.left
+        if (Number(type) === 2) return epData.left + ", " + epData.right
+        return epData.left
+    }
+
+    // Иконка у имён в зависимости от типа
+    function peopleIcon(type) {
+        if (Number(type) === 2) return "people"
+        return "person"
     }
 
     return (
         <>
-            <div onClick={() => navigate(`/episode/${data.slug}`)} className="episodes-item ctt" data-date={data.timePublished} >
+            <div onClick={() => navigate(`/episode/${epData.slug}`)} className="episodes-item ctt" data-date={epData.timePublished} >
 
                 {/* Персонажи и иконки сохранения и прохождения */}
-                <div className="episodes-item__container2">
-                    <div className="episodes-item__icons">
-                        {saved ? <SavedTag /> : ""}
-                        {completed ? <CompletedTag /> : ""}
-                        {completedPerfectly ? <CompletedPerfectlyTag /> : ""}
-                        {(user.sub || data.free) ? "" : <SubsOnlyTag />}
-                        <span className="material-icons episodes-item__people__tag">people</span>
-                    </div>
+                <div className="episodes-item__container">
+                    <span className="material-icons episodes-item__people__tag">{peopleIcon(epData.type)}</span>
                     <div className="episodes-item__people">
-                        {epListNames(data.type)}
+                        {epListNames(epData.type)}
                     </div>
                 </div>
 
                 {/* Картинка и информация */}
-                <div className="episodes-item__container" style={picStyle}>
-
-                    <div className="episodes-item__desc">
-                        {linesDeclension(data.lines)}
-                        {/*  {linesDeclension(data.lines)}, {data.duration} мин. */}
-                    </div>
-
+                <div className={completed || completedPerfectly ? "episodes-item__container2 gray-100" : "episodes-item__container2"} style={picStyle}>
+                    <div className="episodes-item__desc">{linesDeclension(lines)}</div>
                     {/* Дата публикации для админа */}
-                    {user.role === 'admin' ? <div style={{ padding: "10px", color: "white", fontSize: "30px", float: "right", textShadow: "#000 2px 2px 2px" }}>{humanDate(data.timePublished.toDate(), false, true)}</div> : ""}
-                    <div>{saved ? <ProgressBar bar={currentLine} bars={overallLines} /> : ""}</div>
+                    {user.role === 'admin' ? <div style={{ padding: "10px", color: "white", fontSize: "30px", float: "right", textShadow: "#000 2px 2px 2px" }}>{humanDate(epData.timePublished.toDate(), false, true)}</div> : ""}
                 </div>
 
                 {/* Название и прогресс бар прохождения, если есть сохранение */}
                 <div className="episodes-item__container3">
                     {saved ? <div className="episodes-item__progress"><ProgressBar bar={currentLine} bars={overallLines} /></div> : ""}
-                    <div className="episodes-item__name">{data.name}</div>
+                    <div>
+                        {saved ? <SavedTag /> : ""}
+                        {completed ? <CompletedTag /> : ""}
+                        {completedPerfectly ? <CompletedPerfectlyTag /> : ""}
+                        {(user.subbed || epData.free) ? "" : <SubsOnlyTag />}
+                        <div className="episodes-item__name">{epData.name}</div>
+                    </div>
                 </div>
             </div>
         </>
-    );
+    )
 }
-
-function SavedTag() { return <span className="episodes-item__icons__tag material-icons">save</span> }
-
-function CompletedTag() { return <span className="episodes-item__icons__tag material-icons">check</span> }
-
-function CompletedPerfectlyTag() { return <span className="episodes-item__icons__tag material-icons">done_all</span> }
-
-// Значок у платного материала, если юзер без подписки
-function SubsOnlyTag() { return <span className="episodes-item__icons__tag material-icons">local_atm</span> }
