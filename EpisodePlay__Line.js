@@ -1,5 +1,5 @@
 // React
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 
 // Firebase
 import { getStorage, ref, getDownloadURL } from "firebase/storage"
@@ -10,6 +10,9 @@ import { LoadingTag } from "../../../common/Icons"
 // Components
 import Word from "./EpisodePlay__Line__Word"
 
+// Context
+import { GlobalContext } from "../../../../GlobalContext"
+
 // Functions
 import { playSoundUser } from "./EpisodePlay__Sound"
 
@@ -18,6 +21,11 @@ import "./EpisodePlay__Line.scss"
 
 export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) {
     const storage = getStorage()
+    const killAudios = useContext(GlobalContext).killAudios
+
+    useEffect(() => {
+        killAudios()
+    }, [])
 
     const order = logic.data.script[lineIndex].order
     const name = logic.data.script[lineIndex].name
@@ -46,13 +54,11 @@ export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) 
     const [picClasses, setPicClasses] = useState()
     useEffect(() => {
         if (logic.highlightedLine() === lineIndex) {
-            if (type === 'left') return setPicClasses('line-picture pic-loading current-line-highlight')
-            if (type === 'right') return setPicClasses('line-picture pic-loading current-line-highlight')
-            if (type === 'center') return setPicClasses('center-pic pic-loading current-line-highlight')
+            if (type === 'left' || type === 'right') return setPicClasses('line-picture pic-loading current-line-highlight')
+            if (type === 'center') return setPicClasses('center-picture pic-loading current-line-highlight')
         } else {
-            if (type === 'left') return setPicClasses('line-picture left-pic pic-loading')
-            if (type === 'right') return setPicClasses('line-picture pic-loading')
-            if (type === 'center') return setPicClasses('center-pic pic-loading')
+            if (type === 'left' || type === 'right') return setPicClasses('line-picture pic-loading')
+            if (type === 'center') return setPicClasses('center-picture pic-loading')
         }
     }, [logic.currentLine, logic.currentlyPlaying])
 

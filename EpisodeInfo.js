@@ -25,10 +25,15 @@ import LaunchBlock from "../../../common/material-info/LaunchBlock"
 import NoSub from "../../../common/material-info/NoSub"
 
 export function EpisodeInfo({ logic, setLogic }) {
+    const killAudios = useContext(GlobalContext).killAudios
     const user = useContext(GlobalContext).userData
     const setSiteData = useContext(GlobalContext).setSiteData
     const selectTheme = useContext(GlobalContext).selectTheme
     const storage = getStorage()
+
+    useEffect(() => {
+        killAudios()
+    }, [])
 
     // Звуки для картинок
     const [infoAudios, setInfoAudios] = useState()
@@ -56,11 +61,8 @@ export function EpisodeInfo({ logic, setLogic }) {
 
         // Проверка на доступность материала
         setCanLaunch(() => {
-            if (logic.data.free || (!logic.data.free && user.subbed)) {
-                return true
-            } else {
-                return false
-            }
+            if (logic.data.free || (!logic.data.free && user.subbed)) return true
+            return false
         })
     }, [user.subbed])
 
