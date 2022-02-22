@@ -20,6 +20,7 @@ import { linesDeclension, minutesDeclension, humanDate } from "../../../common/H
 import EditBtn from "../../../common/material-info/EditBtn"
 import Extra from "../../../common/material-info/Extra"
 import PicBlock from "./EpisodeInfo__Pics"
+import MonoMsg from "./EpisodeInfo__MonoMsg"
 import LaunchBlock from "../../../common/material-info/LaunchBlock"
 import NoSub from "../../../common/material-info/NoSub"
 
@@ -64,7 +65,7 @@ export function EpisodeInfo({ logic, setLogic }) {
     }, [user.subbed])
 
     // Опции выбора за кого играть
-    const [optionsMode, setOptionsMode] = useState([{ value: 1, label: "" }]);
+    const [optionsMode, setOptionsMode] = useState([{ value: 1, label: "" }])
     useEffect(() => {
         if (Number(logic.data.type) === 1) return setOptionsMode([{ value: 1, label: `${logic.data.left}` }]);
         return setOptionsMode([{ value: 1, label: `${logic.data.left}` }, { value: 2, label: `${logic.data.right}` }, { value: 3, label: "за всех сразу" },]);
@@ -102,26 +103,24 @@ export function EpisodeInfo({ logic, setLogic }) {
                 </div> <br />
 
                 {/* Выбор персонажа, если монолог, то нет выбора */}
-                <Select id={"episode-info-mode-select"}
-                    theme={theme => ({
-                        ...theme,
-                        borderRadius: 0,
-                        colors: {
-                            ...theme.colors,
-                            ...selectTheme
-                        }
-                    })}
-                    onChange={option => setLogic(p => ({ ...p, mode: option.value }))}
-                    options={optionsMode}
-                    value={optionsMode.filter(option => option.value === logic.mode)}
-                    isDisabled={Number(logic.data.type) === 1 ? true : false}
-                    isSearchable={false} />
-
-                {/* Сообщение, что это монолог */}
-                {logic.data.type === 1 ? <span style={{ color: "var(--text3)", marginTop: "20px", display: "block" }} className="ctt">Это монолог, тут только одна роль</span> : ""}
+                {Number(logic.data.type) === 1 ? <MonoMsg name={optionsMode[0].label} /> :
+                    <Select id={"episode-info-mode-select"}
+                        theme={theme => ({
+                            ...theme,
+                            borderRadius: 0,
+                            colors: {
+                                ...theme.colors,
+                                ...selectTheme
+                            }
+                        })}
+                        onChange={option => setLogic(p => ({ ...p, mode: option.value }))}
+                        options={optionsMode}
+                        value={optionsMode.filter(option => option.value === logic.mode)}
+                        isDisabled={Number(logic.data.type) === 1 ? true : false}
+                        isSearchable={false} />}
 
                 {/* Запуск эпизода в зависимости от наличия саба */}
-                {canLaunch ? <LaunchBlock id={logic.id} name={logic.data.name} infoAudios={infoAudios} setLogic={setLogic} /> : <NoSub />}
+                {canLaunch ? <LaunchBlock id={logic.id} name={logic.data.name} infoAudios={infoAudios} page="episodes" setLogic={setLogic} /> : <NoSub />}
             </div>
         </>
     )

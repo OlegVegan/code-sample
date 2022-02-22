@@ -73,9 +73,6 @@ export default function EpisodesListItem({ epData, epIndex, filter }) {
         }
     }, [])
 
-    // Фильтр
-    if (lines > filter.max || lines < filter.min) return ""
-
     // Имена участников в зависимости от типа
     function epListNames(type) {
         if (Number(type) === 2) return epData.left + ", " + epData.right
@@ -87,6 +84,14 @@ export default function EpisodesListItem({ epData, epIndex, filter }) {
         if (Number(type) === 2) return "people"
         return "person"
     }
+
+
+    // Фильтр по размеру
+    if (lines > filter.max || lines < filter.min) return ""
+
+    // Фильтр по типу
+    if (epData.type === 2 && filter.type === 1) return ""
+    if (epData.type === 1 && filter.type === 2) return ""
 
     return (
         <>

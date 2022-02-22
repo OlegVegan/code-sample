@@ -40,6 +40,7 @@ export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) 
                 backgroundImage: 'url(' + url + ')'
             })
         })
+        console.log('logic.highlightedLine()' + logic.highlightedLine())
     }, [])
 
     // Стиль строки
@@ -54,6 +55,8 @@ export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) 
             if (type === 'right') return setPicClasses('line-picture pic-loading')
             if (type === 'center') return setPicClasses('center-pic pic-loading')
         }
+        console.log('ogic.highlightedLine()');
+        console.log(logic.highlightedLine());
     }, [logic.currentLine, logic.currentlyPlaying])
 
     function handleClick() {
@@ -86,7 +89,8 @@ export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) 
             <>
                 <div className=" right-line">
                     <div onClick={() => handleClick()} className={picClasses} style={picStyle}>
-                        {picStyle ? "" : <LoadingTag />}</div>
+                        {picStyle ? "" : <LoadingTag />}
+                    </div>
                     <div className="upper-right-line-text">
                         {text.map((word, index) => <Word logic={logic} notes={notes} wordData={word} wordIndex={index} lineIndex={lineIndex} key={index} />)}
                     </div>
