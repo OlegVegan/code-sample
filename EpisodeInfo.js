@@ -31,15 +31,12 @@ export function EpisodeInfo({ logic, setLogic }) {
     const selectTheme = useContext(GlobalContext).selectTheme
     const storage = getStorage()
 
-    useEffect(() => {
-        killAudios()
-    }, [])
-
     // Звуки для картинок
     const [infoAudios, setInfoAudios] = useState()
     // Можно ли запускать
     const [canLaunch, setCanLaunch] = useState(false)
     useEffect(() => {
+        killAudios()
         setSiteData(p => ({ ...p, topBlock: null, crumbs: 'episode_info' }))
 
         // Звуки для картинок
@@ -67,11 +64,12 @@ export function EpisodeInfo({ logic, setLogic }) {
     }, [user.subbed])
 
     // Опции выбора за кого играть
-    const [optionsMode, setOptionsMode] = useState([{ value: 1, label: "" }])
-    useEffect(() => {
-        if (Number(logic.data.type) === 1) return setOptionsMode([{ value: 1, label: `${logic.data.left}` }]);
-        return setOptionsMode([{ value: 1, label: `${logic.data.left}` }, { value: 2, label: `${logic.data.right}` }, { value: 3, label: "за всех сразу" },]);
-    }, [logic.data])
+    const [optionsMode] = useState(() => {
+        if (Number(logic.data.type) === 1) {
+            return [{ value: 1, label: `${logic.data.left}` }]
+        }
+        return [{ value: 1, label: `${logic.data.left}` }, { value: 2, label: `${logic.data.right}` }, { value: 3, label: "за всех сразу" },]
+    })
 
     if (!logic.data) return <><div id="episode-info"><LoadingTag /></div></>
     return (
@@ -97,10 +95,14 @@ export function EpisodeInfo({ logic, setLogic }) {
                 {/* Количество строк */}
                 <div id="episode-line-counter" className="ctt">
                     <div className={(logic.mode === 1 || logic.mode === 3) ? "line-counter-div" : "line-counter-div pointy"} onClick={() => setLogic(p => ({ ...p, mode: 1 }))}>
-                        <div>{linesDeclension(logic.data.lines_left)}</div>
+                        <div>
+                            {linesDeclension(logic.data.lines_left)}
+                        </div>
                     </div>
                     {Number(logic.data.type) === 2 ? <div className={(logic.mode === 2 || logic.mode === 3) ? "line-counter-div" : "line-counter-div pointy"} onClick={() => setLogic(p => ({ ...p, mode: 2 }))}>
-                        <div id="line-counter-right-info">{linesDeclension(logic.data.lines_right)}</div>
+                        <div id="line-counter-right-info">
+                            {linesDeclension(logic.data.lines_right)}
+                        </div>
                     </div> : ""}
                 </div> <br />
 
