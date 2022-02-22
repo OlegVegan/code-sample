@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react"
 
 // Firebase
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, getDownloadURL } from "firebase/storage"
 
 // Helpers
-import { LoadingTag } from "../../../common/Icons";
+import { LoadingTag } from "../../../common/Icons"
 
 // Components
 import Word from "./EpisodePlay__Line__Word"
@@ -17,7 +17,7 @@ import { playSoundUser } from "./EpisodePlay__Sound"
 import "./EpisodePlay__Line.scss"
 
 export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) {
-    const storage = getStorage();
+    const storage = getStorage()
 
     const order = logic.data.script[lineIndex].order
     const name = logic.data.script[lineIndex].name
@@ -40,7 +40,6 @@ export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) 
                 backgroundImage: 'url(' + url + ')'
             })
         })
-        console.log('logic.highlightedLine()' + logic.highlightedLine())
     }, [])
 
     // Стиль строки
@@ -55,8 +54,6 @@ export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) 
             if (type === 'right') return setPicClasses('line-picture pic-loading')
             if (type === 'center') return setPicClasses('center-pic pic-loading')
         }
-        console.log('ogic.highlightedLine()');
-        console.log(logic.highlightedLine());
     }, [logic.currentLine, logic.currentlyPlaying])
 
     function handleClick() {
