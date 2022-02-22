@@ -1,5 +1,5 @@
 Пример кода проекта https://oochoo.ru
 
-Пишу я на функциональных компонентах, используя хуки. useState, useEffect, useRef, useContext. Сначала я использовал 8 версию Firebase, но сейчас использую модульную 9-ю. Знаю и использую большинство штук стандарта ECMAScript 6
+Резюме — https://docs.google.com/document/d/1AOBlUtplx7jlOPqAqQTiT1Ovg0cxj4czB_9alvUqXhk/edit
 
 Готов к собеседованию — https://t.me/olegvegan
