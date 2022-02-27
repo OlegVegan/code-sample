@@ -1,22 +1,14 @@
 export const defaultEpisodeLogic = {
 
-    /* LAUNCH */
+    /* LAUNCH*/
     playing: false, // Играет ли сейчас
     loading: false, // Загружается ли из localStorage
-
-
-
-
-    /* DATA */
     id: null,
     data: null,
 
-
-
-
     /* BASIC */
     overallLines: null, // Сумма всех строк
-    over: false, // Закончился ли полностью эпизод fixme: last line exception
+    over: false, // Закончился ли полностью эпизод
     mode: 1, // Режим игры - за кого игра
     // Сколько моих строк, (сколько надо сказать строк в зависимости от режима, нужно чтоб узнать когда закончились мои строки для сохранения)
     myLines: function () {
@@ -32,9 +24,6 @@ export const defaultEpisodeLogic = {
     timesPassed: 0, // Сколько раз пройден материал
     failsRecord: 99999, // Сколько раз пройден материал. Если нет записи, ставим большой
     failsToSkip: 2, // Сколько раз надо ошибиться, чтоб можно было пропустить строку
-
-
-
 
     /* LINES */
     // Активная строка. Устанавливается по запуску, смена тригерит запуск звука
@@ -95,9 +84,6 @@ export const defaultEpisodeLogic = {
         return this.currentLine
     },
 
-
-
-
     /* VOX */
     failsCurrent: 0, // Сколько фейлов произношения у активной строки
     failsOverall: 0, // Сколько фейлов произношения за весь материал
@@ -128,16 +114,10 @@ export const defaultEpisodeLogic = {
         }
     },
 
-
-
-
     /* SOUND */
     currentlyPlaying: null, // Какой файл играет в данный момент (Четырёхзначный порядок строки)
     autoSound: true, // Автоматом ли играет звук
     userSound: false, // Запустил ли юзер звук  
-
-
-
 
     /* CONTROLS */
     showTranslation: true, // Показывать перевод
@@ -172,16 +152,10 @@ export const defaultEpisodeLogic = {
         return false
     },
 
-
-
-
-    /* USER MESSAGE */
+    /* MESSAGE */
     msg: "", // Сообщение для юзера
     msgIncompleteTimes: 0, // Сколько раз юзер видел сообщение "Договорите строку"
     msgLimitIncomplete: 3, // Максимально сколько показывать "Договорите строку"
-
-
-
 
     /* ADMIN */
     letMeSkip: false, // Даёт пропускать админу без условий

@@ -23,10 +23,6 @@ export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) 
     const storage = getStorage()
     const killAudios = useContext(GlobalContext).killAudios
 
-    useEffect(() => {
-        killAudios()
-    }, [])
-
     const order = logic.data.script[lineIndex].order
     const name = logic.data.script[lineIndex].name
     const type = logic.data.script[lineIndex].type
@@ -41,6 +37,7 @@ export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) 
     })
 
     useEffect(() => {
+        killAudios()
         getDownloadURL(ref(storage, 'episodes/' + id + '/line_pics/' + name + '.jpg')).then((url) => {
             setStyle({
                 backgroundSize: 'cover',
@@ -53,6 +50,7 @@ export default function Line({ id, notes, lineIndex, logic, setLogic, audios }) 
     // Стиль строки
     const [picClasses, setPicClasses] = useState()
     useEffect(() => {
+        // Активная
         if (logic.highlightedLine() === lineIndex) {
             if (type === 'left' || type === 'right') return setPicClasses('line-picture pic-loading current-line-highlight')
             if (type === 'center') return setPicClasses('center-picture pic-loading current-line-highlight')

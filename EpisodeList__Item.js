@@ -48,43 +48,34 @@ export default function EpisodesListItem({ epData, epIndex, filter }) {
     useEffect(() => {
         if (localStorage.getItem('ep_history')) {
             var ep_history = JSON.parse(localStorage.getItem('ep_history'))
-
-            if (!ep_history[id]) {
-
-                setSaved(false)
-                setCompleted(false)
-                setCompletedPerfectly(false)
-
-            } else {
-
+            if (ep_history[id]) {
                 if (ep_history[id].saved) {
                     setSaved(true)
                     setCurrentLine(ep_history[id].currentLine)
                 }
 
-                if ((ep_history[id].timesPassed > 0) && (ep_history[id].failsRecord > 0)) {
-                    setCompleted(true)
-                }
-
-                if ((ep_history[id].timesPassed > 0) && (ep_history[id].failsRecord === 0)) {
-                    setCompletedPerfectly(true)
+                if ((ep_history[id].timesPassed > 0)) {
+                    if ((ep_history[id].failsRecord > 0)) {
+                        setCompleted(true)
+                    } else {
+                        setCompletedPerfectly(true)
+                    }
                 }
             }
         }
     }, [])
 
     // Имена участников в зависимости от типа
-    function epListNames(type) {
+    function episodeNames(type) {
         if (Number(type) === 2) return epData.left + ", " + epData.right
         return epData.left
     }
 
     // Иконка у имён в зависимости от типа
-    function peopleIcon(type) {
+    function roleIcon(type) {
         if (Number(type) === 2) return "people"
         return "person"
     }
-
 
     // Фильтр по размеру
     if (lines > filter.max || lines < filter.min) return ""
@@ -99,9 +90,11 @@ export default function EpisodesListItem({ epData, epIndex, filter }) {
 
                 {/* Персонажи и иконки сохранения и прохождения */}
                 <div className="episodes-item__container">
-                    <span className="material-icons episodes-item__people__tag">{peopleIcon(epData.type)}</span>
+                    <span className="material-icons episodes-item__people__tag">
+                        {roleIcon(epData.type)}
+                    </span>
                     <div className="episodes-item__people">
-                        {epListNames(epData.type)}
+                        {episodeNames(epData.type)}
                     </div>
                 </div>
 
@@ -109,7 +102,7 @@ export default function EpisodesListItem({ epData, epIndex, filter }) {
                 <div className={completed || completedPerfectly ? "episodes-item__container2 gray-100" : "episodes-item__container2"} style={picStyle}>
                     <div className="episodes-item__desc">{linesDeclension(lines)}</div>
                     {/* Дата публикации для админа */}
-                    {user.role === 'admin' ? <div style={{ padding: "10px", color: "white", fontSize: "30px", float: "right", textShadow: "#000 2px 2px 2px" }}>{humanDate(epData.timePublished.toDate(), false, true)}</div> : ""}
+                    <InfoForAdmin role={user.role} epData={epData} />
                 </div>
 
                 {/* Название и прогресс бар прохождения, если есть сохранение */}
@@ -123,6 +116,17 @@ export default function EpisodesListItem({ epData, epIndex, filter }) {
                         <div className="episodes-item__name">{epData.name}</div>
                     </div>
                 </div>
+            </div>
+        </>
+    )
+}
+
+function InfoForAdmin({ role, epData }) {
+    if (role !== 'admin') return ""
+    return (
+        <>
+            <div style={{ padding: "10px", color: "white", fontSize: "30px", float: "right", textShadow: "#000 2px 2px 2px" }}>
+                {humanDate(epData.timePublished.toDate(), false, true)}
             </div>
         </>
     )
